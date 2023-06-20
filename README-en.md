@@ -1,10 +1,6 @@
-Language: 简体中文 | [English](https://github.com/hemingkx/ChineseNMT/blob/master/README-en.md)
-
 # ChineseNMT
 
-基于transformer的英译中翻译模型🤗。
-
-项目说明参考知乎文章：[教你用PyTorch玩转Transformer英译中翻译模型！](https://zhuanlan.zhihu.com/p/347061440)
+This is a **Transformer** based neural machine translation(**NMT**) model🤗.
 
 ## Data
 
@@ -12,15 +8,15 @@ The dataset is from [WMT 2018 Chinese-English track](http://statmt.org/wmt18/tra
 
 ## Data Process
 
-### 分词
+### Word Segmentation
 
-- 工具：[sentencepiece](https://github.com/google/sentencepiece)
-- 预处理：`./data/get_corpus.py`抽取train、dev和test中双语语料，分别保存到`corpus.en`和`corpus.ch`中，每行一个句子。
-- 训练分词模型：`./tokenizer/tokenize.py`中调用了sentencepiece.SentencePieceTrainer.Train()方法，利用`corpus.en`和`corpus.ch`中的语料训练分词模型，训练完成后会在`./tokenizer`文件夹下生成`chn.model`，`chn.vocab`，`eng.model`和`eng.vocab`，其中`.model`和`.vocab`分别为模型文件和对应的词表。
+- **Tool**：[sentencepiece](https://github.com/google/sentencepiece)
+- **Preprocess**：Run `./data/get_corpus.py` , in which we will get bilingual data to build our training, dev and testing set.  The data will be saved in `corpus.en` and `corpus.ch`, with one sentence in each line.
+- **Word segmentation model training**: Run `./tokenizer/tokenize.py`, in which the *sentencepiece.SentencePieceTrainer.Train()* mothed is called to train our word segmentation model. After training, `chn.model`，`chn.vocab`，`eng.model` and `eng.vocab` will be saved in `./tokenizer`.  `.model` is the word segmentation model we need and `.vocab` is the vocabulary.
 
 ## Model
 
-采用Harvard开源的 [transformer-pytorch](http://nlp.seas.harvard.edu/2018/04/03/attention.html) ，中文说明可参考 [传送门](https://zhuanlan.zhihu.com/p/144825330) 。
+We use the open-source code [transformer-pytorch](http://nlp.seas.harvard.edu/2018/04/03/attention.html) developmented by Harvard.
 
 ## Requirements
 
@@ -39,19 +35,19 @@ pip install -r requirements.txt
 
 ## Usage
 
-模型参数在`config.py`中设置。
+Hyperparameters can be modified in `config.py`.
 
-- 由于transformer显存要求，支持MultiGPU，需要设置`config.py`中的`device_id`列表以及`main.py`中的`os.environ['CUDA_VISIBLE_DEVICES']`。
+- This code supports MultiGPU training. You should modify `device_id` list in  `config.py` and `os.environ['CUDA_VISIBLE_DEVICES']` in `main.py` to use your own GPUs.
 
-如要运行模型，可在命令行输入：
+To start training, please run:
 
 ```
 python main.py
 ```
 
-实验结果在`./experiment/train.log`文件中，测试集翻译结果在`./experiment/output.txt`中。
+The training log is saved in `./experiment/train.log`, and the translation results of testing dataset is in `./experiment/output.txt`.
 
-> 在两块GeForce GTX 1080 Ti上运行，每个epoch用时一小时左右。
+> Training on 2 GeForce GTX 1080 Ti, 1h/epoch.
 
 ## Results
 
@@ -63,13 +59,11 @@ python main.py
 
 ## Pretrained Model
 
-训练好的 Model 2 模型（当前最优模型）可以在如下链接直接下载😊：
-
-链接: https://pan.baidu.com/s/1RKC-HV_UmXHq-sy1-yZd2Q  密码: g9wl
+You can email me if you need the pretrained model (Model 2 -- The best performance model)😊. I will send you a google drive download link.
 
 ## Beam Search
 
-当前最优模型（Model 2）使用beam search测试的结果
+The testing results of Model 2 with beam search:
 
 | Beam_size |   2   |   3   |   4   |     5     |
 | :-------: | :---: | :---: | :---: | :-------: |
@@ -77,21 +71,21 @@ python main.py
 
 ## One Sentence Translation
 
-将训练好的model或者上述Pretrained model以`model.pth`命名，保存在`./experiment`路径下。在`main.py`中运行`translate_example`，即可实现单句翻译。
+Name the pretrained model or your own trained model with `model.pth` and save it in the path `./experiment`. Run `translate_example` method in `main.py`, and then you can get one sentence translation result.
 
-如英文输入单句为：
+English Input Sentence for example:
 
 ```
 The near-term policy remedies are clear: raise the minimum wage to a level that will keep a fully employed worker and his or her family out of poverty, and extend the earned-income tax credit to childless workers.
 ```
 
-ground truth为：
+ground truth:
 
 ```
 近期的政策对策很明确：把最低工资提升到足以一个全职工人及其家庭免于贫困的水平，扩大对无子女劳动者的工资所得税减免。
 ```
 
-beam size = 3的翻译结果为：
+Translation result with beam size = 3:
 
 ```
 短期政策方案很清楚:把最低工资提高到充分就业的水平,并扩大向无薪工人发放所得的税收信用。
